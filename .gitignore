@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/HealthCareApi-dev-v3/DesignTimeBuild
+/.vs/HealthCareApi-dev-v3/FileContentIndex
+/.vs/ProjectEvaluation
+/bin/Debug
+/.vs/HealthCareApi-dev-v3/v17
+/obj
+/.vs/HealthCareApi-dev-v3/config
