@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using HealthCareApi_dev_v3.Models;
+using HealthCareApi_dev_v3.Models.DTO;
 using HealthCareApi_dev_v3.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 
 namespace HealthCareApi_dev_v3.Repositories
@@ -10,64 +12,71 @@ namespace HealthCareApi_dev_v3.Repositories
     {
         public HealthcareContext Context { get; set; }
         public IMapper Mapper { get; set; }
-        
+
         public PractitionerRepository(HealthcareContext context, IMapper mapper)
         {
             Context = context;
             Mapper = mapper;
 
         }             
-         async Task<IEnumerable<Practitioner>> IPractitionerRepository.GetAll()
+       
+        async Task<IEnumerable<PractitionerDTO>> IPractitionerRepository.GetAll()
         {
+            //Traigo los practitioners de la db
             var practitioners = await Context.Practitioner.ToListAsync();
 
-            return practitioners;
+            //Select hace que los elementos de una secuencia puedan tener otra forma. Le pido que retorne practitioners, pero mapeando cada practitioner a PractitionerDTO.
+            return practitioners.Select(practitioner => Mapper.Map<PractitionerDTO>(practitioner));
         }
-
-        async Task<Practitioner> IPractitionerRepository.CreatePractitioner(Practitioner practitioner)
+        
+        //No tiene sentido que el Create Practitioner devuelva un dto, si lo estoy creando necesito todos los datos, al menos por primera vez.
+        public async Task<Practitioner> CreatePractitioner(Practitioner practitioner)
         {
-            var newPractitioner = Mapper.Map<Practitioner>(practitioner);
-            
-            await Context.Practitioner.AddAsync(newPractitioner);
+            await Context.Practitioner.AddAsync(practitioner);
 
             Context.SaveChanges();
 
-            return newPractitioner;
+            return practitioner;
         }
 
-        //Cree el GetById para que al hacer el post, me pueda traer el practitioner a modificar necesitando solo el id.
+        public async Task<PractitionerDTO> DTOGetById(Guid id)
+        {
+            var practitioner = await Context.Practitioner.FindAsync(id);
+
+            /*var practitioner2 = await Context.Practitioner.FirstOrDefaultAsync(p => p.Id == id);
+
+            foreach (var item in Context.Practitioner)
+            {
+                if (item.Id == id)
+                    return item;
+
+            }*/
+            
+            return Mapper.Map<PractitionerDTO>(practitioner);
+        }
+
         public async Task<Practitioner> GetById(Guid id)
         {
             var practitioner = await Context.Practitioner.FindAsync(id);
 
-            //Implementé response, copiando a los chicos, porque queria agregarle validación al GetById y que el Put devuelva algo. Lo voy a implementar en el resto de métodos. 
-           /* if (practitioner == null)
-             {
-                 return response = new Response{ Code = 400, Message="Practitioner not found"};
-             } */
-            return practitioner;            
+            return practitioner;
         }
 
-        public async Task<Response> UpdatePractitioner(Guid id, Practitioner practitioner)
+        public async Task<Practitioner> UpdatePractitioner(PractitionerDTO practitioner)
         {
-          
-           var existingPractitioner = await GetById(id);
+            //Si los datos que actualicé del Practitioner, son datos como el cbu, o el cuit, no tendría sentido devolver un Practitioner?
+            //Para poder hacer eso, deberia poder mapear un practitioner a un practitioner, lo que no tendría mucho sentido de configurar en el automapper.
+            //Por eso solo dejo que actualicen los datos del practitionerdto.
 
-            if (existingPractitioner != null)
-            {
-                Mapper.Map(practitioner, existingPractitioner);
-                
-                Context.Practitioner.Update(existingPractitioner);
-                
-                await Context.SaveChangesAsync();
+            var existingPractitioner = await GetById(practitioner.Id);
 
-                return new Response { Code = 200, Message = "Practitioner updated" };
-            }
-            else
-            {
-                return new Response { Code = 400, Message = "Practitioner doesn't exists" };
-            }
+            Mapper.Map(practitioner, existingPractitioner);
 
+            Context.Practitioner.Update(existingPractitioner);
+
+            await Context.SaveChangesAsync();
+
+            return existingPractitioner;
         }
     }
 }

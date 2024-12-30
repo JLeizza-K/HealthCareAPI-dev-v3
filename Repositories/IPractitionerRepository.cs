@@ -7,9 +7,10 @@ namespace HealthCareApi_dev_v3.Repositories
 {
     public interface IPractitionerRepository
     {
-        Task<IEnumerable<Practitioner>> GetAll();
+        Task<IEnumerable<PractitionerDTO>> GetAll();
+        Task<PractitionerDTO> DTOGetById(Guid id);
         Task<Practitioner> GetById(Guid id);
         Task<Practitioner> CreatePractitioner(Practitioner practitioner);
-        Task<Response> UpdatePractitioner(Guid id, Practitioner practitioner);
+        Task<Practitioner> UpdatePractitioner(PractitionerDTO practitioner);
     }
 }
