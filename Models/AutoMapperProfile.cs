@@ -11,7 +11,9 @@ namespace HealthCareApi_dev_v3.Models
         {
             CreateMap<Practitioner, PractitionerDTO>()
                 .ReverseMap();
-                        
+
+            CreateMap<Practitioner, PractitionerUpdateDTO>()
+                .ReverseMap();
         }
     }
 }

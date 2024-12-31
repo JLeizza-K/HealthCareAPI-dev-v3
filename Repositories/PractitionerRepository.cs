@@ -39,36 +39,16 @@ namespace HealthCareApi_dev_v3.Repositories
             return practitioner;
         }
 
-        public async Task<PractitionerDTO> DTOGetById(Guid id)
+        public async Task<PractitionerDTO> GetById(Guid id)
         {
             var practitioner = await Context.Practitioner.FindAsync(id);
-
-            /*var practitioner2 = await Context.Practitioner.FirstOrDefaultAsync(p => p.Id == id);
-
-            foreach (var item in Context.Practitioner)
-            {
-                if (item.Id == id)
-                    return item;
-
-            }*/
             
             return Mapper.Map<PractitionerDTO>(practitioner);
         }
 
-        public async Task<Practitioner> GetById(Guid id)
+        public async Task<Practitioner> UpdatePractitioner(PractitionerUpdateDTO practitioner)
         {
-            var practitioner = await Context.Practitioner.FindAsync(id);
-
-            return practitioner;
-        }
-
-        public async Task<Practitioner> UpdatePractitioner(PractitionerDTO practitioner)
-        {
-            //Si los datos que actualicé del Practitioner, son datos como el cbu, o el cuit, no tendría sentido devolver un Practitioner?
-            //Para poder hacer eso, deberia poder mapear un practitioner a un practitioner, lo que no tendría mucho sentido de configurar en el automapper.
-            //Por eso solo dejo que actualicen los datos del practitionerdto.
-
-            var existingPractitioner = await GetById(practitioner.Id);
+            var existingPractitioner = Mapper.Map<Practitioner>(GetById(practitioner.Id));
 
             Mapper.Map(practitioner, existingPractitioner);
 
@@ -76,7 +56,7 @@ namespace HealthCareApi_dev_v3.Repositories
 
             await Context.SaveChangesAsync();
 
-            return existingPractitioner;
+            return Mapper.Map<Practitioner>(existingPractitioner);
         }
     }
 }

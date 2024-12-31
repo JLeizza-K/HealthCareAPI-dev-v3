@@ -40,8 +40,8 @@ namespace HealthCareApi_dev_v3.Controllers
             return Ok(newPractitioner);
         }
 
-        [HttpPut]
-        public async Task<ActionResult> UpdatePractitioner (PractitionerDTO practitioner)
+        [HttpPatch]
+        public async Task<ActionResult> UpdatePractitioner (PractitionerUpdateDTO practitioner)
         {
             if (practitioner.Id == Guid.Empty)
             {
