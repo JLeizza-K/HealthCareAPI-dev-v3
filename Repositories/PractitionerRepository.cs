@@ -38,20 +38,20 @@ namespace HealthCareApi_dev_v3.Repositories
 
             return practitioner;
         }
-
-        public async Task<PractitionerDTO> GetById(Guid id)
+        //Deje el getbyid de solo practitioner porque lo necesito para el update. Si después necesito uno que devuelva los dto, lo armo. 
+        public async Task<Practitioner> GetById(Guid id)
         {
             var practitioner = await Context.Practitioner.FindAsync(id);
             
-            return Mapper.Map<PractitionerDTO>(practitioner);
+            return practitioner;
         }
 
         public async Task<Practitioner> UpdatePractitioner(PractitionerUpdateDTO practitioner)
         {
-            var existingPractitioner = Mapper.Map<Practitioner>(GetById(practitioner.Id));
+            var existingPractitioner = await GetById(practitioner.Id);
 
             Mapper.Map(practitioner, existingPractitioner);
-
+       
             Context.Practitioner.Update(existingPractitioner);
 
             await Context.SaveChangesAsync();
