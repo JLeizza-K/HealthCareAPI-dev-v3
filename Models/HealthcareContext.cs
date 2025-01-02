@@ -8,10 +8,13 @@ namespace HealthCareApi_dev_v3.Models
     {
         public HealthcareContext(DbContextOptions<HealthcareContext> options) : base(options) { }
         public virtual DbSet<Practitioner> Practitioner {get; set;}
+        public virtual DbSet<Speciality> Speciality { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Practitioner>().ToTable("Practitioner");
+
+            modelBuilder.Entity<Speciality>().ToTable("Speciality");
         }
     }
 }

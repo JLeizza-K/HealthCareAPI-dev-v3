@@ -22,14 +22,12 @@ namespace HealthCareApi_dev_v3.Repositories
        
         async Task<IEnumerable<PractitionerDTO>> IPractitionerRepository.GetAll()
         {
-            //Traigo los practitioners de la db
             var practitioners = await Context.Practitioner.ToListAsync();
 
             //Select hace que los elementos de una secuencia puedan tener otra forma. Le pido que retorne practitioners, pero mapeando cada practitioner a PractitionerDTO.
             return practitioners.Select(practitioner => Mapper.Map<PractitionerDTO>(practitioner));
         }
         
-        //No tiene sentido que el Create Practitioner devuelva un dto, si lo estoy creando necesito todos los datos, al menos por primera vez.
         public async Task<Practitioner> CreatePractitioner(Practitioner practitioner)
         {
             await Context.Practitioner.AddAsync(practitioner);

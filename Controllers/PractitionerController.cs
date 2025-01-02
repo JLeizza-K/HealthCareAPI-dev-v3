@@ -11,11 +11,9 @@ namespace HealthCareApi_dev_v3.Controllers
     public class PractitionerController : ControllerBase
     {
         public IPractitionerRepository Repository;
-        public IMapper Mapper { get; set; }
-        public PractitionerController(IPractitionerRepository repository, IMapper mapper)
+        public PractitionerController(IPractitionerRepository repository)
         {
-            Repository = repository;
-            Mapper = mapper;    
+            Repository = repository;   
         }
 
         [HttpGet]

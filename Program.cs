@@ -14,6 +14,7 @@ internal class Program
         builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
+        builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
         builder.Services.AddDbContext<HealthcareContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("HealthCareDevSQL")));
 
         var configuration = builder.Configuration;
