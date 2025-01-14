@@ -1,4 +1,5 @@
-﻿using HealthCareApi_dev_v3.Models.Entities;
+﻿using HealthCareApi_dev_v3.Models.DTO;
+using HealthCareApi_dev_v3.Models.Entities;
 using HealthCareApi_dev_v3.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,10 +30,11 @@ namespace HealthCareApi_dev_v3.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Speciality>> CreateSpeciality(Speciality speciality)
+        public async Task<ActionResult<Speciality>> CreateSpeciality(SpecialityDTO speciality)
         {
             //Esto diferencia entre mayusculas y minusculas?
-            var existingSpeciality = await Repository.GetSpecialityByName(speciality.Name);
+            var existingSpeciality = await Repository.GetByName(speciality.Name);
+
             if (existingSpeciality != null)
             {
                 //Puedo agregarle un mensaje al badrequest?
@@ -43,27 +45,27 @@ namespace HealthCareApi_dev_v3.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<Response>> DeleteSpeciality(string name)
+        public async Task<ActionResult<Response>> DeleteSpeciality(Guid id)
         {
-            var existingSpeciality = await Repository.GetSpecialityByName(name);
+            var existingSpeciality = await Repository.GetById(id);
             if (existingSpeciality == null)
             {
                 return BadRequest();
             }
 
-            return Ok(await Repository.DeleteSpeciality(name));
+            return Ok(await Repository.DeleteSpeciality(id));
         }
 
         [HttpPatch]
-        public async Task<ActionResult<Response>> EnableSpeciality(string name)
+        public async Task<ActionResult<Response>> EnableSpeciality(Guid id)
         {
-            var existingSpeciality = await Repository.GetSpecialityByName(name);
+            var existingSpeciality = await Repository.GetById(id);
             if (existingSpeciality == null)
             {
                 return BadRequest();
             }
 
-            return Ok(await Repository.EnableSpeciality(name));
+            return Ok(await Repository.EnableSpeciality(id));
         }
     }
 }

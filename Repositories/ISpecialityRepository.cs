@@ -1,19 +1,22 @@
-﻿using HealthCareApi_dev_v3.Models.Entities;
+﻿using HealthCareApi_dev_v3.Models.DTO;
+using HealthCareApi_dev_v3.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HealthCareApi_dev_v3.Repositories
 {
     public interface ISpecialityRepository
     {
-        public Task<IEnumerable<Speciality>> GetSpecialities();
+        public Task<IEnumerable<SpecialityDTO>> GetSpecialities();
 
-        public Task<Speciality> GetSpecialityByName(string name);
+        public Task<SpecialityDTO> GetByName(string name);
 
-        public Task<Speciality> CreateSpeciality(Speciality newSpeciality);
+        public Task<Speciality> GetById(Guid specialityId);
 
-        public Task<Response> DeleteSpeciality(string name);
+        public Task<SpecialityDTO> CreateSpeciality(SpecialityDTO speciality);
 
-        public Task<Response> EnableSpeciality(string name);
+        public Task<Response> DeleteSpeciality(Guid id);
+
+        public Task<Response> EnableSpeciality(Guid id);
 
     }
 }

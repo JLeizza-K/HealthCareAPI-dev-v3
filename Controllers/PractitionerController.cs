@@ -24,11 +24,13 @@ namespace HealthCareApi_dev_v3.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreatePractitioner(Practitioner practitioner)
+        public async Task<ActionResult> CreatePractitioner(PractitionerCreateDTO practitioner)
         {
-            var existingPractitioner = await Repository.GetById(practitioner.Id);
-           
-            if (existingPractitioner != null || practitioner == null || practitioner.Id == Guid.Empty)
+            var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
+
+           //tiene sentido verificar si el practitioner es null antes de hacer la consulta?
+            
+            if (existingPractitioner != null || practitioner == null)
             {
                 return BadRequest();
             }
@@ -41,12 +43,8 @@ namespace HealthCareApi_dev_v3.Controllers
         [HttpPatch]
         public async Task<ActionResult> UpdatePractitioner (PractitionerUpdateDTO practitioner)
         {
-            if (practitioner.Id == Guid.Empty)
-            {
-                return BadRequest();
-            }
              //Hago dos veces el get by id, acá y dentro del repository, no sería mejor validarlo dentro del repository y no tengo que hacer dos veces la consulta?
-            var existingPractitioner = await Repository.GetById(practitioner.Id);
+            var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
             if (existingPractitioner == null)
             {
                 return BadRequest();

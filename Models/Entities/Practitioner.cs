@@ -15,6 +15,8 @@ namespace HealthCareApi_dev_v3.Models.Entities
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
-
+        //Estas son las navigation properties. Permiten navegar y acceder a las entidades relacionadas.
+        public IEnumerable<PractitionerSpeciality> PractitionerSpeciality { get; set; }
+        public IEnumerable<Appointment> Appointment { get; set; }
     }
 }

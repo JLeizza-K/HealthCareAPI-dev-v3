@@ -15,6 +15,7 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
         builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
+        builder.Services.AddScoped<IPatientRepository, PatientRepository>();
         builder.Services.AddDbContext<HealthcareContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("HealthCareDevSQL")));
 
         var configuration = builder.Configuration;

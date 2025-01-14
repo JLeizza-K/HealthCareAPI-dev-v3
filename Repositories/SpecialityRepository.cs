@@ -1,45 +1,66 @@
-﻿using HealthCareApi_dev_v3.Models;
+﻿using AutoMapper;
+using HealthCareApi_dev_v3.Models;
+using HealthCareApi_dev_v3.Models.DTO;
 using HealthCareApi_dev_v3.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace HealthCareApi_dev_v3.Repositories
 {
     public class SpecialityRepository : ISpecialityRepository
     {
         public HealthcareContext Context { get; set; }
+        public IMapper Mapper { get; set; } 
 
-        public SpecialityRepository(HealthcareContext context) 
+        public SpecialityRepository(HealthcareContext context, IMapper mapper) 
         {
             Context = context;
+            Mapper = mapper;
         }
 
-        public async Task<IEnumerable<Speciality>> GetSpecialities()
+        public async Task<IEnumerable<SpecialityDTO>> GetSpecialities()
         {
-            var specialities = await Context.Speciality.ToListAsync();
+            var specialities = await Context.Speciality
+                .ToListAsync();
 
-            return specialities.Where(specialities => specialities.Enable);
+            return specialities
+                .Where(speciality => speciality.Enable)
+                .Select(speciality => Mapper.Map<SpecialityDTO>(speciality));
         }
 
-        public Task<Speciality> GetSpecialityByName(string name)
+        public async Task<SpecialityDTO> GetByName(string name)
         {
-            var existingSpeciality = Context.Speciality.FirstOrDefaultAsync(x => x.Name == name);
+            var existingSpeciality = await Context.Speciality
+                .Include(s => s.PractitionerSpeciality)
+                    .ThenInclude(ps => ps.Practitioner)
+                .FirstOrDefaultAsync(x => x.Name == name);
 
-            return existingSpeciality;
+            return Mapper.Map<SpecialityDTO>(existingSpeciality);
         }
-
-        public async Task<Speciality> CreateSpeciality(Speciality speciality)
+        public async Task<Speciality> GetById(Guid specialityId)
         {
-            await Context.Speciality.AddAsync(speciality);
+            var speciality = await Context.Speciality
+                    .FirstOrDefaultAsync(x => x.Id == specialityId);
+
+            return speciality;
+        }
+        public async Task<SpecialityDTO> CreateSpeciality(SpecialityDTO speciality)
+        {
+            var newSpeciality = Mapper.Map<Speciality>(speciality);
+
+            newSpeciality.Id = Guid.NewGuid();
+
+            await Context.Speciality.AddAsync(newSpeciality);
 
             Context.SaveChanges();
             
             return speciality;
         }
 
-        public async Task<Response> DeleteSpeciality(string name)
+        public async Task<Response> DeleteSpeciality(Guid id)
         {
-            var existingSpeciality = await GetSpecialityByName(name);
+            var existingSpeciality = await GetById(id);
            
             existingSpeciality.Enable = false;
             
@@ -50,9 +71,9 @@ namespace HealthCareApi_dev_v3.Repositories
             return new Response() { Code = 200, Message = "Speciality deleted" };
         }
 
-        public async Task<Response> EnableSpeciality(string name)
+        public async Task<Response> EnableSpeciality(Guid id)
         {
-            var existingSpeciality = await GetSpecialityByName(name);
+            var existingSpeciality = await GetById(id);
            
             existingSpeciality.Enable = true;
             
@@ -62,5 +83,7 @@ namespace HealthCareApi_dev_v3.Repositories
 
             return new Response() { Code = 200, Message = "Speciality enabled" };
         }
+       
+
     }
 }
