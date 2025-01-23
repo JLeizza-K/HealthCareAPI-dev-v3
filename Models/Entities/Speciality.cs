@@ -8,5 +8,7 @@
 
         //Estas son las navigation properties. Permiten navegar y acceder a las entidades relacionadas.
         public IEnumerable<PractitionerSpeciality> PractitionerSpeciality { get; set; }
+        public IEnumerable<Availability> Availabilities { get; set; }
+        public IEnumerable<OfficeSpeciality> OfficeSpeciality { get; set; }
     }
 }

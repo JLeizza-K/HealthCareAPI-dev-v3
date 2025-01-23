@@ -3,7 +3,7 @@
     public class TimeSlot
     {
         public Guid Id { get; set; }
-        public TimeSpan Duration { get; } = TimeSpan.FromMinutes(30);
-        public bool Status { get; set; }
+        public string Status { get; set; }
+
     }
 }

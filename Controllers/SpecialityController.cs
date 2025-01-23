@@ -29,6 +29,20 @@ namespace HealthCareApi_dev_v3.Controllers
             return Ok(specialities);
         }
 
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<Speciality>>> GetById(Guid id)
+        {
+            var speciality = await Repository.GetById(id);
+
+            if (speciality == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(speciality);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Speciality>> CreateSpeciality(SpecialityDTO speciality)
         {

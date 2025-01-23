@@ -4,13 +4,12 @@
     {
         public Guid Id { get; set; }
         public Guid PractitionerId { get; set; }
-        public Guid OfficeId { get; set; }
         public Guid SpecialityId { get; set; }
+        public Guid OfficeId { get; set; }
 
 
-        public DateTime Date { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan FinishTime { get; set; }
+        public DateTime StartAvailability { get; set; }
+        public DateTime FinishAvailability { get; set; }
         public IEnumerable<TimeSlot> TimeSlot { get; set; }
 
         //Navigation properties.

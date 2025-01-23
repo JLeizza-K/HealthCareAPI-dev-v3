@@ -35,10 +35,6 @@ namespace HealthCareApi_dev_v3.Models
             CreateMap<Speciality, SpecialityDTO>()
                 .ReverseMap();
 
-            CreateMap<Speciality, SpecialityListPractitionerDTO>()
-                  .ForMember(dest => dest.Practitioner, opt => opt.MapFrom(src => src.PractitionerSpeciality.Select(ps => ps.Practitioner)))
-                  .ReverseMap();
-
              CreateMap<Patient, PatientDTO>()
                 .ReverseMap();
             
@@ -46,6 +42,8 @@ namespace HealthCareApi_dev_v3.Models
                .ReverseMap();
             
             CreateMap<PatientCreateDTO, Patient>();
+
+            CreateMap<AvailabilityCreateDTO, Availability>();
 
         }
     }

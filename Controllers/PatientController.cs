@@ -28,7 +28,7 @@ namespace HealthCareApi_dev_v3.Controllers
         [HttpPost]
         public async Task<ActionResult> CreatePatient(PatientCreateDTO patient)
         {
-            var existingPatient = await Repository.GetByEmail(patient.Email);
+            var existingPatient = await Repository.GetPatientByEmail(patient.Email);
 
             if (existingPatient != null || patient == null)
             {
@@ -45,7 +45,7 @@ namespace HealthCareApi_dev_v3.Controllers
         {
             //Hago dos veces el get by id, acá y dentro del repository, no sería mejor validarlo dentro del repository y no tengo que hacer dos veces la consulta?
             //Haciendo los updates con el email, no podría actualizarlo nunca. ¿Lo puedo hacer de otra manera?
-            var existingPatient = await Repository.GetByEmail(patient.Email);
+            var existingPatient = await Repository.GetPatientByEmail(patient.Email);
             if (existingPatient == null)
             {
                 return BadRequest();
@@ -62,7 +62,7 @@ namespace HealthCareApi_dev_v3.Controllers
 
         public async Task<ActionResult> DeletePatient (Guid id)
         {
-            var existingPatient = await Repository.GetById(id);
+            var existingPatient = await Repository.GetPatientById(id);
             if (existingPatient == null)
             {
                 return BadRequest();

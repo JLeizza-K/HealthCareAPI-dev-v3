@@ -34,6 +34,8 @@ namespace HealthCareApi_dev_v3.Repositories
             var existingSpeciality = await Context.Speciality
                 .Include(s => s.PractitionerSpeciality)
                     .ThenInclude(ps => ps.Practitioner)
+                 .Include(s => s.OfficeSpeciality)
+                    .ThenInclude(os => os.Office)
                 .FirstOrDefaultAsync(x => x.Name == name);
 
             return Mapper.Map<SpecialityDTO>(existingSpeciality);
@@ -41,6 +43,10 @@ namespace HealthCareApi_dev_v3.Repositories
         public async Task<Speciality> GetById(Guid specialityId)
         {
             var speciality = await Context.Speciality
+               /* .Include(s => s.PractitionerSpeciality)
+                    .ThenInclude(ps => ps.Practitioner)
+                 .Include(s => s.OfficeSpeciality)
+                    .ThenInclude(os => os.Office) */
                     .FirstOrDefaultAsync(x => x.Id == specialityId);
 
             return speciality;

@@ -13,7 +13,7 @@ namespace HealthCareApi_dev_v3.Controllers
         public IPractitionerRepository Repository;
         public PractitionerController(IPractitionerRepository repository)
         {
-            Repository = repository;   
+            Repository = repository;
         }
 
         [HttpGet]
@@ -28,22 +28,22 @@ namespace HealthCareApi_dev_v3.Controllers
         {
             var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
 
-           //tiene sentido verificar si el practitioner es null antes de hacer la consulta?
-            
+            //tiene sentido verificar si el practitioner es null antes de hacer la consulta?
+
             if (existingPractitioner != null || practitioner == null)
             {
                 return BadRequest();
             }
-           
+
             var newPractitioner = await Repository.CreatePractitioner(practitioner);
-            
+
             return Ok(newPractitioner);
         }
 
         [HttpPatch]
-        public async Task<ActionResult> UpdatePractitioner (PractitionerUpdateDTO practitioner)
+        public async Task<ActionResult> UpdatePractitioner(PractitionerUpdateDTO practitioner)
         {
-             //Hago dos veces el get by id, acá y dentro del repository, no sería mejor validarlo dentro del repository y no tengo que hacer dos veces la consulta?
+            //Hago dos veces el get by id, acá y dentro del repository, no sería mejor validarlo dentro del repository y no tengo que hacer dos veces la consulta?
             var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
             if (existingPractitioner == null)
             {
@@ -57,6 +57,19 @@ namespace HealthCareApi_dev_v3.Controllers
 
         }
 
+        [HttpPost("{id}/availability")]
+        public async Task<ActionResult> CreateAvailability (AvailabilityCreateDTO availability)
+        {
+            if (availability == null)
+            {
+                return BadRequest();
 
+            }
+
+            var newAvailability = await Repository.CreateAvailability(availability);
+
+            return Ok(newAvailability);
+
+        }
     }
 }

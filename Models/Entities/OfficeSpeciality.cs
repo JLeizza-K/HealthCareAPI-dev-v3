@@ -9,7 +9,7 @@
         public Guid SpecialityId { get; set; }
 
         //Navigation properties.
-        public Office office { get; set; }
-        public Speciality speciality { get; set; }
+        public Office Office { get; set; }
+        public Speciality Speciality { get; set; }
     }
 }

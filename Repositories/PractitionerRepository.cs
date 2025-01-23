@@ -32,14 +32,14 @@ namespace HealthCareApi_dev_v3.Repositories
             return practitioners.Select(practitioner => Mapper.Map<PractitionerDTO>(practitioner));
         }
 
-        public async Task<PractitionerDTO> GetById(Guid id)
+        public async Task<Practitioner> GetById(Guid id)
         {
             var practitioner = await Context.Practitioner
                 .Include(p => p.PractitionerSpeciality)
                     .ThenInclude(ps => ps.Speciality)
                 .FirstOrDefaultAsync(p => (p.Id) == id);
 
-            return Mapper.Map<PractitionerDTO>(practitioner);
+            return practitioner;
         }
 
         public async Task<Practitioner> GetByEmail(string email)
@@ -85,5 +85,84 @@ namespace HealthCareApi_dev_v3.Repositories
 
             return Mapper.Map<PractitionerUpdateDTO>(existingPractitioner);
         }
+
+
+        
+        public async Task<Response> CreateAvailability (AvailabilityCreateDTO availability)
+        {
+            
+            List<Office> offices = Context.Office.ToList();
+
+            //ordena la lista por la speciality del practitioner, para revisar primero si se puede en las que coinciden con la 
+            //especialidad
+
+            offices.OrderBy(o => !o.OfficeSpeciality
+                    .Any(os => os.SpecialityId == availability.SpecialityId));
+
+            var newAvailability = Mapper.Map<Availability>(availability);
+
+            foreach (Office office in offices)
+            {
+                               
+                var officeAvailable = !Context.Availability.Any(a => a.Office.Id == office.Id &&
+                a.StartAvailability.CompareTo(availability.FinishAvailability) < 0 &&
+                a.FinishAvailability.CompareTo(availability.StartAvailability) > 0);
+
+                /*
+                // empieza a las 11 y la availability termina a las 13
+                a.StartAvailability < availability.FinishAvailability && 
+                //y termina a las 15 y la availability empieza a las 10
+                a.FinishAvailability > availability.StartAvailability);
+               */
+
+                if (officeAvailable == true)
+                {
+                    newAvailability.Office = office;
+                    break;
+                }
+            }
+           
+            if (newAvailability.Office == null)
+            {
+                return new Response { Code = 409, Message = "Couldn't find an available office, please try another time range or try again later." };
+            }
+
+            newAvailability.OfficeId = newAvailability.Office.Id;
+
+            var timeSpanLenght = new TimeSpan(0, availability.AppointmentLenght, 0);
+            var lastAppointment = availability.FinishAvailability.Subtract(timeSpanLenght);
+            var currentTime = availability.StartAvailability;
+            
+            List<TimeSlot> slots = new List<TimeSlot>();
+
+            while (currentTime <= lastAppointment)
+            {
+                var timeslot = new TimeSlot { Id = Guid.NewGuid(), Status = "Available" };
+
+                slots.Add(timeslot);
+                
+                Context.Add(timeslot);
+
+                currentTime += timeSpanLenght;
+            }
+            
+            newAvailability.TimeSlot = slots;
+
+            newAvailability.Practitioner = await GetById(availability.PractitionerId);
+            newAvailability.PractitionerId = newAvailability.Practitioner.Id;
+
+            newAvailability.Speciality = await SpecialityRepository.GetById(availability.SpecialityId);
+            newAvailability.SpecialityId = newAvailability.Speciality.Id;
+
+            newAvailability.Id = Guid.NewGuid();
+
+            Context.Add(newAvailability);
+            
+            await Context.SaveChangesAsync();
+
+            return new Response { Code = 200, Message = "Availability created successfully" };
+        }
+        
+
     }
 }

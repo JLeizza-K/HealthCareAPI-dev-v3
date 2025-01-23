@@ -30,7 +30,7 @@ namespace HealthCareApi_dev_v3.Repositories
             return new Response { Code = 200, Message = "Patient created successfully" }; 
         }
 
-        public async Task<PatientDTO> GetById(Guid patientId)
+        public async Task<PatientDTO> GetPatientById(Guid patientId)
         {
             var patient = await Context.Patient.FirstOrDefaultAsync(p => p.Id == patientId);
             
@@ -44,7 +44,7 @@ namespace HealthCareApi_dev_v3.Repositories
 
             return patients.Select(patients => Mapper.Map<PatientDTO>(patients));
         }
-        public async Task<Patient> GetByEmail(string email)
+        public async Task<Patient> GetPatientByEmail(string email)
         {
             var patient = await Context.Patient.FirstOrDefaultAsync(p => (p.Email) == email);
 
@@ -52,7 +52,7 @@ namespace HealthCareApi_dev_v3.Repositories
         }
         public async Task<Response> UpdatePatient(PatientUpdateDTO patient)
         {
-            var existingPatient = await GetByEmail(patient.Email);
+            var existingPatient = await GetPatientByEmail(patient.Email);
             
             Mapper.Map(patient, existingPatient);
 

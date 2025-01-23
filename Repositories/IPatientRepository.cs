@@ -7,12 +7,14 @@ namespace HealthCareApi_dev_v3.Repositories
     {
         public Task<IEnumerable<PatientDTO>> GetPatients();
 
-        public Task<PatientDTO> GetById(Guid patientId);
+        public Task<PatientDTO> GetPatientById(Guid patientId);
+
+        public Task<Patient> GetPatientByEmail(string email);
 
         public Task<Response> CreatePatient(PatientCreateDTO patient);
 
         public Task<Response> UpdatePatient(PatientUpdateDTO patient);
-        public Task<Patient> GetByEmail(string email);
+
         public Task<Response> DeletePatient(Guid id);
     }
 }
