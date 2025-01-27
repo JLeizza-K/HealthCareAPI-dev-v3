@@ -90,6 +90,15 @@ namespace HealthCareApi_dev_v3.Repositories
         
         public async Task<Response> CreateAvailability (AvailabilityCreateDTO availability)
         {
+     
+
+            var existingPractSpec = !Context.PractitionerSpeciality.
+                Any(ps => ps.PractitionerId == availability.PractitionerId && ps.SpecialityId == availability.SpecialityId);
+            
+            if (existingPractSpec)
+            {
+                return new Response { Code = 409, Message = "The selected practitioner does not practice the requested specialty." };
+            }
             
             List<Office> offices = Context.Office.ToList();
 
@@ -107,13 +116,6 @@ namespace HealthCareApi_dev_v3.Repositories
                 var officeAvailable = !Context.Availability.Any(a => a.Office.Id == office.Id &&
                 a.StartAvailability.CompareTo(availability.FinishAvailability) < 0 &&
                 a.FinishAvailability.CompareTo(availability.StartAvailability) > 0);
-
-                /*
-                // empieza a las 11 y la availability termina a las 13
-                a.StartAvailability < availability.FinishAvailability && 
-                //y termina a las 15 y la availability empieza a las 10
-                a.FinishAvailability > availability.StartAvailability);
-               */
 
                 if (officeAvailable == true)
                 {

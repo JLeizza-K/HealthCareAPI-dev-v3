@@ -57,13 +57,18 @@ namespace HealthCareApi_dev_v3.Controllers
 
         }
 
-        [HttpPost("{id}/availability")]
+        [HttpPost("/availability")]
         public async Task<ActionResult> CreateAvailability (AvailabilityCreateDTO availability)
         {
             if (availability == null)
             {
                 return BadRequest();
 
+            }
+           
+            if (availability.AppointmentLenght < 10)
+            {
+                return BadRequest(new Response { Code = 409, Message = "The appointment lenght must be longer than 10 minutes." });
             }
 
             var newAvailability = await Repository.CreateAvailability(availability);
