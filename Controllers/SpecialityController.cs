@@ -51,8 +51,8 @@ namespace HealthCareApi_dev_v3.Controllers
 
             if (existingSpeciality != null)
             {
-                //Puedo agregarle un mensaje al badrequest?
-                return BadRequest();
+
+                return BadRequest(new Response { Code= 409, Message= "Speciality alredy exists."});
             }
 
             return Ok(await Repository.CreateSpeciality(speciality));
@@ -64,7 +64,7 @@ namespace HealthCareApi_dev_v3.Controllers
             var existingSpeciality = await Repository.GetById(id);
             if (existingSpeciality == null)
             {
-                return BadRequest();
+                return BadRequest(new Response { Code = 400, Message = "Speciality doesn't exists." });
             }
 
             return Ok(await Repository.DeleteSpeciality(id));

@@ -11,9 +11,10 @@ namespace HealthCareApi_dev_v3.Repositories
         Task<IEnumerable<PractitionerDTO>> GetAll();
         Task<Practitioner> GetById(Guid id);
         Task<Practitioner> GetByEmail(string email);
-        Task<PractitionerCreateDTO> CreatePractitioner(PractitionerCreateDTO practitioner);
+        Task<Response> CreatePractitioner(PractitionerCreateDTO practitioner);
         Task<PractitionerUpdateDTO> UpdatePractitioner(PractitionerUpdateDTO practitioner);
         Task<Response> CreateAvailability(AvailabilityCreateDTO availability);
+        Task<Response> DeletePractitioner(Guid id);
 
     }
 }

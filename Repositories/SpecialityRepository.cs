@@ -29,16 +29,16 @@ namespace HealthCareApi_dev_v3.Repositories
                 .Select(speciality => Mapper.Map<SpecialityDTO>(speciality));
         }
 
-        public async Task<SpecialityDTO> GetByName(string name)
+        public async Task<Speciality> GetByName(string name)
         {
             var existingSpeciality = await Context.Speciality
-                .Include(s => s.PractitionerSpeciality)
+             /*   .Include(s => s.PractitionerSpeciality)
                     .ThenInclude(ps => ps.Practitioner)
                  .Include(s => s.OfficeSpeciality)
-                    .ThenInclude(os => os.Office)
+                    .ThenInclude(os => os.Office)*/
                 .FirstOrDefaultAsync(x => x.Name == name);
 
-            return Mapper.Map<SpecialityDTO>(existingSpeciality);
+            return existingSpeciality;
         }
         public async Task<Speciality> GetById(Guid specialityId)
         {

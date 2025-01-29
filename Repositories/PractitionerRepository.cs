@@ -52,7 +52,7 @@ namespace HealthCareApi_dev_v3.Repositories
             return practitioner;
         }
 
-        public async Task<PractitionerCreateDTO> CreatePractitioner(PractitionerCreateDTO practitioner)
+        public async Task<Response> CreatePractitioner(PractitionerCreateDTO practitioner)
         {
             var newPractitioner = Mapper.Map<Practitioner>(practitioner);
 
@@ -64,13 +64,15 @@ namespace HealthCareApi_dev_v3.Repositories
 
             foreach (var speciality in practitioner.Speciality)
             {
-                practitionerSpeciality.Add(new PractitionerSpeciality { PractitionerId = newPractitioner.Id, SpecialityId = speciality.Id });
+                var existingSpeciality = await SpecialityRepository.GetByName(speciality.Name);
+
+                practitionerSpeciality.Add(new PractitionerSpeciality { PractitionerId = newPractitioner.Id, SpecialityId = existingSpeciality.Id });
 
             }
 
             Context.SaveChanges();
 
-            return practitioner;
+            return new Response { Code = 200, Message = "Practitioner created successfully" };
         }
 
         public async Task<PractitionerUpdateDTO> UpdatePractitioner(PractitionerUpdateDTO practitioner)
@@ -86,6 +88,16 @@ namespace HealthCareApi_dev_v3.Repositories
             return Mapper.Map<PractitionerUpdateDTO>(existingPractitioner);
         }
 
+        public async Task<Response> DeletePractitioner(Guid id)
+        {
+            var existingPractitioner = await GetById(id);
+         
+            existingPractitioner.IsActive = false;
+
+            await Context.SaveChangesAsync();
+
+            return new Response { Code = 200, Message = "Practitioner deleted successfully" };
+        }
 
         
         public async Task<Response> CreateAvailability (AvailabilityCreateDTO availability)

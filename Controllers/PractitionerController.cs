@@ -3,6 +3,7 @@ using HealthCareApi_dev_v3.Models.DTO;
 using HealthCareApi_dev_v3.Models.Entities;
 using HealthCareApi_dev_v3.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 
 namespace HealthCareApi_dev_v3.Controllers
 {
@@ -47,7 +48,7 @@ namespace HealthCareApi_dev_v3.Controllers
             var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
             if (existingPractitioner == null)
             {
-                return BadRequest();
+                return BadRequest(new Response { Code= 404, Message = "Practitioner not found"});
             }
             else
             {
@@ -55,6 +56,19 @@ namespace HealthCareApi_dev_v3.Controllers
                 return Ok(practitioner);
             }
 
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeletePractitioner (Guid id)
+        {
+            var existingPractitioner = await Repository.GetById(id);
+            if (existingPractitioner == null)
+            {
+                return BadRequest(new Response { Code = 404, Message = "Practitioner not found" });
+            }
+            var response = Repository.DeletePractitioner(id);
+
+            return Ok(response);
         }
 
         [HttpPost("/availability")]

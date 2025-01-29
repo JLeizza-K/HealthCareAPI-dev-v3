@@ -22,7 +22,7 @@ namespace HealthCareApi_dev_v3.Repositories
            var newPatient = Mapper.Map<Patient>(patient);
 
             newPatient.Id = Guid.NewGuid();
-            newPatient.Enable = true;
+            newPatient.IsActive = true;
             
             await Context.AddAsync(newPatient);
             Context.SaveChanges();
@@ -67,7 +67,7 @@ namespace HealthCareApi_dev_v3.Repositories
         {
             var existingPatient = await Context.Patient.FirstOrDefaultAsync(Patient => Patient.Id == id);
            
-            existingPatient.Enable = false;
+            existingPatient.IsActive = false;
             
             Context.Patient.Update(existingPatient);
 

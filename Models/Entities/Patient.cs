@@ -9,7 +9,7 @@
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string Insurance { get; set; }
-        public bool Enable { get; set; }
+        public bool IsActive { get; set; }
 
         public IEnumerable<Appointment> Appointments { get; set; }
 

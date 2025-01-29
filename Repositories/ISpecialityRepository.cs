@@ -8,7 +8,7 @@ namespace HealthCareApi_dev_v3.Repositories
     {
         public Task<IEnumerable<SpecialityDTO>> GetSpecialities();
 
-        public Task<SpecialityDTO> GetByName(string name);
+        public Task<Speciality> GetByName(string name);
 
         public Task<Speciality> GetById(Guid specialityId);
 
