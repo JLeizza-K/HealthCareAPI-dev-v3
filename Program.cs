@@ -1,4 +1,7 @@
+using AutoMapper;
 using HealthCareApi_dev_v3.Models;
+using HealthCareApi_dev_v3.Models.DTO;
+using HealthCareApi_dev_v3.Models.Entities;
 using HealthCareApi_dev_v3.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -12,6 +15,7 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+        builder.Services.AddScoped<IMappingAction<PractitionerCreateDTO, Practitioner>, PractitionerMappingAction>();
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
         builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
