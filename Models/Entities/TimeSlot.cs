@@ -5,6 +5,6 @@
         public Guid Id { get; set; }
         public Guid AvailabilityId { get; set; }
         public string Status { get; set; }
-
+        public DateTime Time { get; set; }
     }
 }

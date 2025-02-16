@@ -9,7 +9,6 @@
 
         //Navigation properties.
         public Patient Patient { get; set; }
-        public Office Office { get; set; }
         public TimeSlot TimeSlot { get; set; }
 
         

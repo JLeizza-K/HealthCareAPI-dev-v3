@@ -56,6 +56,7 @@ namespace HealthCareApi_dev_v3.Repositories
             var newSpeciality = Mapper.Map<Speciality>(speciality);
 
             newSpeciality.Id = Guid.NewGuid();
+            newSpeciality.Enable = true;
 
             await Context.Speciality.AddAsync(newSpeciality);
 

@@ -20,8 +20,16 @@ namespace HealthCareApi_dev_v3.Models
 
             CreateMap<PractitionerCreateDTO, Practitioner>()
                 .ForMember(dest => dest.PractitionerSpeciality, opt => opt.Ignore()) // Lo ignoramos para manejarlo manualmente
-                    .AfterMap<PractitionerMappingAction>();
-            //Ignora PractitionerSpeciality y lo gestiona con un aftermap. 
+                    .AfterMap((src, dest) =>
+                    {
+                        dest.PractitionerSpeciality = src.Speciality
+                                .Select(s => new PractitionerSpeciality
+                                {
+                                    SpecialityId = s.Id,
+                                    PractitionerId = dest.Id
+                                })
+                                .ToList();
+                    });
 
             CreateMap<Speciality, SpecialityDTO>()
                 .ReverseMap();
@@ -35,30 +43,17 @@ namespace HealthCareApi_dev_v3.Models
             CreateMap<PatientCreateDTO, Patient>();
 
             CreateMap<AvailabilityCreateDTO, Availability>();
+                //.ForMember(dest => dest.PractitionerId, opt => opt.Ignore())
+                //.AfterMap((src, dest) =>
+                //{
+                //    dest.Practitioner.Id = src.PractitionerId;
+                //    dest.Speciality.Id = src.SpecialityId;
+                //});
+             CreateMap<AppointmentDTO, Appointment>();
 
         }
     }
 
-    public class PractitionerMappingAction : IMappingAction<PractitionerCreateDTO, Practitioner>
-    {
-        public HealthcareContext Context { get; set; }
 
-        public PractitionerMappingAction (HealthcareContext context)
-        {
-            Context = context;
-        }
-
-            public void Process(PractitionerCreateDTO source, Practitioner destination, ResolutionContext context)
-        {
-            destination.PractitionerSpeciality = source.Speciality
-                .Select(specialityDTO => new PractitionerSpeciality
-                {
-                    SpecialityId = Context.Speciality
-                    .FirstOrDefault(speciality => speciality.Name == specialityDTO.Name).Id,
-                    PractitionerId = destination.Id
-                })
-                .ToList();
-        }
-    }
 
 }

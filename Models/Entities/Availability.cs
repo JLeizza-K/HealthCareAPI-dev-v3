@@ -1,4 +1,4 @@
-﻿namespace HealthCareApi_dev_v3.Models.Entities
+﻿    namespace HealthCareApi_dev_v3.Models.Entities
 {
     public class Availability
     {

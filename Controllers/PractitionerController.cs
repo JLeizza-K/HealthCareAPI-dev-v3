@@ -41,11 +41,11 @@ namespace HealthCareApi_dev_v3.Controllers
             return Ok(newPractitioner);
         }
 
-        [HttpPatch]
-        public async Task<ActionResult> UpdatePractitioner(PractitionerUpdateDTO practitioner)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdatePractitioner(Guid id, PractitionerUpdateDTO practitioner)
         {
             //Hago dos veces el get by id, acá y dentro del repository, no sería mejor validarlo dentro del repository y no tengo que hacer dos veces la consulta?
-            var existingPractitioner = await Repository.GetByEmail(practitioner.Email);
+            var existingPractitioner = await Repository.GetById(id);
             if (existingPractitioner == null)
             {
                 return BadRequest(new Response { Code= 404, Message = "Practitioner not found"});
@@ -86,8 +86,8 @@ namespace HealthCareApi_dev_v3.Controllers
             }
 
             var newAvailability = await Repository.CreateAvailability(availability);
-
-            return Ok(newAvailability);
+ 
+            return newAvailability.Code == 200 ? Ok(newAvailability) : BadRequest(newAvailability);
 
         }
     }

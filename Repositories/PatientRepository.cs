@@ -27,7 +27,7 @@ namespace HealthCareApi_dev_v3.Repositories
             await Context.AddAsync(newPatient);
             Context.SaveChanges();
 
-            return new Response { Code = 200, Message = "Patient created successfully" }; 
+            return new Response { Code = 201, Message = "Patient created successfully" }; 
         }
 
         public async Task<PatientDTO> GetPatientById(Guid patientId)

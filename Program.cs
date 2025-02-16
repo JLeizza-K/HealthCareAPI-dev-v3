@@ -15,9 +15,9 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-        builder.Services.AddScoped<IMappingAction<PractitionerCreateDTO, Practitioner>, PractitionerMappingAction>();
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
+        builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
         builder.Services.AddScoped<IPatientRepository, PatientRepository>();
         builder.Services.AddDbContext<HealthcareContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("HealthCareDevSQL")));

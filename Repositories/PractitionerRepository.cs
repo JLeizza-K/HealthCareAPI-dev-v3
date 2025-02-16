@@ -5,6 +5,7 @@ using HealthCareApi_dev_v3.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Collections.Concurrent;
+using System.Reflection.Metadata.Ecma335;
 
 
 namespace HealthCareApi_dev_v3.Repositories
@@ -24,7 +25,7 @@ namespace HealthCareApi_dev_v3.Repositories
 
         }             
        
-        async Task<IEnumerable<PractitionerDTO>> IPractitionerRepository.GetAll()
+       public async Task<IEnumerable<PractitionerDTO>> GetAll()
         {
             var practitioners = await Context.Practitioner.ToListAsync();
 
@@ -75,9 +76,13 @@ namespace HealthCareApi_dev_v3.Repositories
             return new Response { Code = 200, Message = "Practitioner created successfully" };
         }
 
-        public async Task<PractitionerUpdateDTO> UpdatePractitioner(PractitionerUpdateDTO practitioner)
+        public async Task<Response> UpdatePractitioner(PractitionerUpdateDTO practitioner)
         {
             var existingPractitioner = await GetByEmail(practitioner.Email);
+            if (existingPractitioner == null)
+            {
+                return new Response { Code = 404, Message = "Practitioner not found" };
+            };
 
             Mapper.Map(practitioner, existingPractitioner);
        
@@ -85,7 +90,8 @@ namespace HealthCareApi_dev_v3.Repositories
 
             await Context.SaveChangesAsync();
 
-            return Mapper.Map<PractitionerUpdateDTO>(existingPractitioner);
+            return new Response { Code = 200, Message = "Practitioner updated successfully" };
+
         }
 
         public async Task<Response> DeletePractitioner(Guid id)
@@ -100,83 +106,97 @@ namespace HealthCareApi_dev_v3.Repositories
         }
 
         
-        public async Task<Response> CreateAvailability (AvailabilityCreateDTO availability)
+        public async Task<Response> CreateAvailability (AvailabilityCreateDTO payload)
         {
-     
+            var availability = Mapper.Map<Availability>(payload);
 
-            var existingPractSpec = !Context.PractitionerSpeciality.
-                Any(ps => ps.PractitionerId == availability.PractitionerId && ps.SpecialityId == availability.SpecialityId);
-            
-            if (existingPractSpec)
+            var existingPractSpec = Context.PractitionerSpeciality.
+                Any(ps => ps.PractitionerId == payload.PractitionerId && ps.SpecialityId == payload.SpecialityId);
+
+            if (!existingPractSpec)
             {
                 return new Response { Code = 409, Message = "The selected practitioner does not practice the requested specialty." };
             }
-            
-            List<Office> offices = Context.Office.ToList();
 
-            //ordena la lista por la speciality del practitioner, para revisar primero si se puede en las que coinciden con la 
-            //especialidad
+            availability.Practitioner = Context.Practitioner.FirstOrDefault(p => p.Id == payload.PractitionerId);
+            availability.Speciality = Context.Speciality.FirstOrDefault(s => s.Id == payload.SpecialityId);
+            availability.Office = AssignOffice(payload, payload.SpecialityId);
 
-            offices.OrderBy(o => !o.OfficeSpeciality
-                    .Any(os => os.SpecialityId == availability.SpecialityId));
-
-            var newAvailability = Mapper.Map<Availability>(availability);
-
-            foreach (Office office in offices)
+            if (availability.Office == null)
             {
-                               
-                var officeAvailable = !Context.Availability.Any(a => a.Office.Id == office.Id &&
-                a.StartAvailability.CompareTo(availability.FinishAvailability) < 0 &&
-                a.FinishAvailability.CompareTo(availability.StartAvailability) > 0);
+                var generalSpecialityId = Context.Speciality.FirstOrDefault(s => s.Name == "General").Id;
 
-                if (officeAvailable == true)
+                if (generalSpecialityId != null)
                 {
-                    newAvailability.Office = office;
-                    break;
+                    availability.Office = AssignOffice(payload, generalSpecialityId);
                 }
             }
-           
-            if (newAvailability.Office == null)
-            {
+
+            if (availability.Office == null)
                 return new Response { Code = 409, Message = "Couldn't find an available office, please try another time range or try again later." };
+
+            availability.OfficeId = availability.Office.Id;
+            availability.TimeSlot = CreateTimeSlots(payload);
+            availability.PractitionerId = availability.Practitioner.Id;
+            availability.SpecialityId = availability.Speciality.Id;
+
+            Context.Add(availability);
+
+            if (await Context.SaveChangesAsync() != 0)
+                return new Response { Code = 200, Message = "Availability created successfully" };
+            else
+                return new Response { Code = 200 };
+        }
+
+        private Office AssignOffice(AvailabilityCreateDTO payload, Guid SpecialityId)
+        {
+            var offices = Context.Office.Where(o => o.OfficeSpeciality.Any(os => os.SpecialityId == SpecialityId))
+                            .ToList();
+
+            if (offices.Count == 0)
+            {
+                return null;
+
             }
+            else
+            {
 
-            newAvailability.OfficeId = newAvailability.Office.Id;
+                foreach (Office office in offices)
+                {
 
-            var timeSpanLenght = new TimeSpan(0, availability.AppointmentLenght, 0);
-            var lastAppointment = availability.FinishAvailability.Subtract(timeSpanLenght);
-            var currentTime = availability.StartAvailability;
-            
+                    var officeAvailable = !Context.Availability.Any(a => a.Office.Id == office.Id &&
+                    a.StartAvailability.CompareTo(payload.FinishAvailability) < 0 &&
+                    a.FinishAvailability.CompareTo(payload.StartAvailability) > 0);
+
+                    if (officeAvailable)
+                    {
+                        return office;
+                    }
+                }
+
+            }
+            return null;
+        }
+
+        private List<TimeSlot> CreateTimeSlots(AvailabilityCreateDTO payload)
+        {
+            var currentTime = payload.StartAvailability;
+
             List<TimeSlot> slots = new List<TimeSlot>();
 
-            while (currentTime <= lastAppointment)
+            while (currentTime <= payload.FinishAvailability.AddMinutes(-payload.AppointmentLenght))
             {
-                var timeslot = new TimeSlot { Id = Guid.NewGuid(), Status = "Available" };
+               currentTime = currentTime.AddMinutes(payload.AppointmentLenght);
+
+                var timeslot = new TimeSlot { Id = Guid.NewGuid(), Status = "Available", Time = currentTime };
 
                 slots.Add(timeslot);
-                
+
                 Context.Add(timeslot);
-
-                currentTime += timeSpanLenght;
             }
-            
-            newAvailability.TimeSlot = slots;
 
-            newAvailability.Practitioner = await GetById(availability.PractitionerId);
-            newAvailability.PractitionerId = newAvailability.Practitioner.Id;
-
-            newAvailability.Speciality = await SpecialityRepository.GetById(availability.SpecialityId);
-            newAvailability.SpecialityId = newAvailability.Speciality.Id;
-
-            newAvailability.Id = Guid.NewGuid();
-
-            Context.Add(newAvailability);
-            
-            await Context.SaveChangesAsync();
-
-            return new Response { Code = 200, Message = "Availability created successfully" };
+            return slots;
         }
-        
 
     }
 }

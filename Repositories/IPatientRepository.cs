@@ -16,5 +16,6 @@ namespace HealthCareApi_dev_v3.Repositories
         public Task<Response> UpdatePatient(PatientUpdateDTO patient);
 
         public Task<Response> DeletePatient(Guid id);
+
     }
 }

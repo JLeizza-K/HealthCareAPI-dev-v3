@@ -9,7 +9,7 @@ namespace HealthCareApi_dev_v3.Models.DTO
 
         public DateTime StartAvailability { get; set; }
         public DateTime FinishAvailability { get; set; }
-        public int AppointmentLenght { get; set; }
+        public double AppointmentLenght { get; set; }
 
 
     }
