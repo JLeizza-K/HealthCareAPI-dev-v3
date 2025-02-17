@@ -15,6 +15,7 @@ namespace HealthCareApi_dev_v3.Models
         public virtual DbSet<PractitionerSpeciality> PractitionerSpeciality { get; set; }
         public virtual DbSet<OfficeSpeciality> OfficeSpeciality { get; set; }
         public virtual DbSet<TimeSlot> TimeSlot { get; set; }
+       // public virtual DbSet<Constants> StatusTypes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PractitionerSpeciality>()

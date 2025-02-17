@@ -30,10 +30,12 @@ namespace HealthCareApi_dev_v3.Repositories
                 return new Response { Code = 404, Message = "TimeSlot doesn't exist" };
             }
 
+            existingTimeSlot.Status = "Booked";
+
             var appointment = Mapper.Map<Appointment>(payload);
+            appointment.Created = DateTime.Now;
             Context.Add(appointment);
             Context.SaveChanges();
-
 
             return new Response { Code = 200, Message = "Appointment created successfully" };
 
